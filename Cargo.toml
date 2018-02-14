@@ -1,0 +1,10 @@
+[package]
+name = "yac8"
+version = "0.1.0"
+authors = ["Aish Raj Dahal <contact@aishraj.com>"]
+
+[lib]
+crate-type = ["cdylib"]
+  
+[dependencies]
+lazy_static = "1.0"
