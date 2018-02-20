@@ -2,11 +2,9 @@ let canvas = document.getElementById("canvas");
 let context = canvas.getContext('2d');
 context.scale(10,10);
 
-
-// var c = document.getElementById("myCanvas");
-// var ctx = c.getContext("2d");
-// ctx.scale(10,10);
-// ctx.fillRect(63, 31,1,1);
+const keyPadMap = {
+  49: 0x1, 50: 0x2, 51: 0x3, 52: 0xc, 81: 0x4, 87: 0x5, 69: 0x6, 82: 0xd, 65: 0x7, 83: 0x8, 68: 0x9, 70: 0xe, 90: 0xa, 88: 0x0, 67: 0xb, 86: 0xf
+};
 
 // Returns an object containing functions that can be called in from Rust.
 function imports() {
@@ -32,25 +30,39 @@ fetch('wasm/yac8.wasm').then(response =>
 ).then(results => {
   let module = {}
   let mod = results.instance;
-  module.perform_action = mod.exports.perform_action;
+  module.read_and_process_instruction = mod.exports.read_and_process_instruction;
+  module.on_key_down = mod.exports.on_key_down;
+  module.on_key_up = mod.exports.on_key_up;
+  module.redraw = mod.exports.redraw;
+  module.decrement_timers = mod.exports.decrement_timers;
 
   let start = null;
   let prevTimestamp = null;
   let drawAndUpdateState = (timestamp) => {
-    //console.log("Current timestamp is", timestamp); //TODO Maybe get rid of this or display it in the canvas.
-    //Initialize state
     if (!prevTimestamp) {
       start = timestamp;
       prevTimestamp = timestamp;
       window.requestAnimationFrame(drawAndUpdateState);
-      //setTimeout(function() {drawAndUpdateState(10);});
       return;
     }
-
-    module.perform_action();
+    for (let i = 0; i < 9; i++) {
+      module.read_and_process_instruction();
+    }
+    module.decrement_timers();
+    module.redraw();
     window.requestAnimationFrame(drawAndUpdateState);
   };
 
+  document.addEventListener('keydown', event => {
+    module.on_key_down(keypadMap[event.keyCode]);
+  });
+  
+  document.addEventListener('keyup', event => {
+    module.on_key_up(keypadMap[event.keyCode]);
+  });
+
   drawAndUpdateState();
 
-})
+});
+
+
