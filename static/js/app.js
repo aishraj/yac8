@@ -18,6 +18,9 @@ function imports() {
     context.fillRect(x,y,1,1);
   }
 
+  function get_random() {
+    return Math.random();
+  }
 
   let imports =  { clear_screen, draw_pixel};
   return imports;

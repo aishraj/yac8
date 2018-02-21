@@ -1,9 +1,11 @@
 use std::os::raw::c_int;
 use std::os::raw::c_char;
+use std::os::raw::c_double;
 
 extern "C" {
   fn clear_screen();
   fn draw_pixel(_: c_int, _: c_int);
+  fn get_random() -> c_double;
 }
 
 #[no_mangle]
